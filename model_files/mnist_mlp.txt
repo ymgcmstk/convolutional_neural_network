@@ -1,0 +1,6 @@
+Input 28 28 1
+IPLayer 100
+ReLULayer
+IPLayer 10
+SoftmaxLayer
+Output
