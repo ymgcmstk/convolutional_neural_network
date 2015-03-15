@@ -9,6 +9,12 @@ public:
     if (prev_layer == NULL) return false;
     return true;
   }
+  bool calc_influence() {
+    if (prev_layer == NULL) return false;
+    //とりあえずcross entropy誤差
+    prev_layer->influence = TODO;
+    return true;
+  }
   void white () {
     //whitening用のdataが必要
   }

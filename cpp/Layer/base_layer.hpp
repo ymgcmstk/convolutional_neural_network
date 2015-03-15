@@ -12,8 +12,11 @@ public:
   virtual bool backward () {
     return true;
   }
+  virtual bool calc_influence() {
+    return true;
+  }
   int x, y, z;
-  MatrixXf data;
+  MatrixXf data, influence;
   void print() {
     for (int i = 0; i < x * y * z; i++) cout << data(i, 0) << " ";
     cout << endl;
@@ -28,3 +31,9 @@ public:
   }
   BaseLayer *next_layer, *prev_layer;
 };
+
+/*
+memo
+各layerの各出力ごとにd(loss) / d(output_ij)を計算しそれを各layerに保持させる
+だから次の層で計算して前の層に渡すのが丸い
+ */

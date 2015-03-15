@@ -16,6 +16,13 @@ public:
       updating_layer = updating_layer->prev_layer;
     }
   }
+  void calc_influence () {
+    BaseLayer* updating_layer = output_layer;
+    while (updating_layer->calc_influence()) {
+      updating_layer = updating_layer->prev_layer;
+    }
+  }
+
   void print_output () {
     last_layer->print();
   }

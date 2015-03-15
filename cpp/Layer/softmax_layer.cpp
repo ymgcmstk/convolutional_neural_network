@@ -11,4 +11,7 @@ public:
     if (prev_layer == NULL) return false;
     return true;
   }
+  bool calc_influence() {
+    return true;
+  }
 };
