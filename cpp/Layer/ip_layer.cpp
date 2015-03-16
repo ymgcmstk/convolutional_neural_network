@@ -14,7 +14,8 @@ public:
   }
   bool backward () {
     if (prev_layer == NULL) return false;
-    //TODO
+    prev_layer->influence = weights.transpose() * influence;
+    weights = weights - influence.asDiagonal() * (MatrixXf::Ones(wx, 1) * prev_layer->vectorize());
     return true;
   }
 };

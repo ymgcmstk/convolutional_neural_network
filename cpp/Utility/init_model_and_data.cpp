@@ -19,6 +19,7 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
     string buf_string, layer_name;
     BaseLayer *new_layer, *prev_layer;
     int input_x, input_y, input_z, wx;
+    float learning_rate;
     if (! file) {
       cout << "ErrorErrorErrorError(init_model_and_data)" << endl;
       cout << fname << " does not exist." << endl;
@@ -33,7 +34,9 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
         set_data_size(new_layer, input_x, input_y, input_z);
         prev_layer = new_layer;
       } else if (layer_name == "Output") {
+        sscanf(buf_string.c_str(), "Output %f", &learning_rate);
         new_layer = new DataLayer();
+        new_layer->learning_rate = learning_rate;
         bs.output_layer = new_layer;
         set_data_size(new_layer, input_x, input_y, input_z);
         new_layer->prev_layer = prev_layer;

@@ -22,13 +22,17 @@ int main () {
   BaseStructure bs;
   init_model_and_data(fname, bs);
   srand((unsigned)time(NULL));
+  int iter = 0;
   while (true) {
     unsigned long ind = get_random_long(mnist_max);
     bs.input_layer->data = access_image(ind);
     bs.output_layer->data = access_label(ind);
     bs.forward();
-    bs.print_output();
-    break;
+    iter++;
+    if (iter % 100 == 0) {
+      bs.print_output();
+      cout << iter << endl;
+    }
   }
   return 0;
 }

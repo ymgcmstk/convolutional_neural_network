@@ -11,6 +11,8 @@ public:
   }
   bool backward () {
     if (prev_layer == NULL) return false;
+    prev_layer->influence =
+      (prev_layer->data.array()>0.0).cast<float>().array() * influence.array();
     return true;
   }
 };

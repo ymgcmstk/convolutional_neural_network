@@ -9,9 +9,14 @@ public:
   }
   bool backward () {
     if (prev_layer == NULL) return false;
+    transposed = prev_layer->influence.transpose();
+    diagonal = prev_layer->influence.asDiagonal();
+    prev_layer->influence =
+      (
+        ((-prev_layer->influence/prev_layer->data.squaredNorm()) * transposed) + diagonal
+      ) * influence;
     return true;
   }
-  bool calc_influence() {
-    return true;
-  }
+private:
+  MatrixXf transposed, diagonal;
 };

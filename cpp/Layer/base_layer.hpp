@@ -12,11 +12,9 @@ public:
   virtual bool backward () {
     return true;
   }
-  virtual bool calc_influence() {
-    return true;
-  }
   int x, y, z;
   MatrixXf data, influence;
+  float learning_rate;
   void print() {
     for (int i = 0; i < x * y * z; i++) cout << data(i, 0) << " ";
     cout << endl;

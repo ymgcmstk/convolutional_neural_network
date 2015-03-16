@@ -3,4 +3,4 @@ IPLayer 100
 ReLULayer
 IPLayer 10
 SoftmaxLayer
-Output
+Output 0.00001
