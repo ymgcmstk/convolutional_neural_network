@@ -19,6 +19,9 @@ public:
   void print_output () {
     last_layer->print();
   }
+  bool is_correct () {
+    return output_layer->is_correct();
+  }
   BaseLayer *input_layer;
   BaseLayer *output_layer, *last_layer;
 };

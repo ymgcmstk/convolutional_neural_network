@@ -1,20 +1,25 @@
 class SoftmaxLayer : public BaseLayer {
 public:
+  SoftmaxLayer () {
+    layer_name = "SoftmaxLayer";
+  }
   void initialize() {}
   bool forward () {
     if (next_layer == NULL) return false;
     data = prev_layer->data.array().exp();
     data = data / data.sum();
+    debug();
     return true;
   }
   bool backward () {
     if (prev_layer == NULL) return false;
-    transposed = prev_layer->influence.transpose();
-    diagonal = prev_layer->influence.asDiagonal();
+    transposed = data.transpose();
+    diagonal = data.asDiagonal();
     prev_layer->influence =
       (
-        ((-prev_layer->influence/prev_layer->data.squaredNorm()) * transposed) + diagonal
+        diagonal - ((prev_layer->data/prev_layer->data.squaredNorm()) * transposed)
       ) * influence;
+    debug();
     return true;
   }
 private:

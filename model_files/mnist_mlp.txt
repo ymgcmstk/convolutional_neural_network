@@ -1,6 +1,5 @@
 Input 28 28 1
-IPLayer 100
-ReLULayer
+IPLayer 20
+PReLULayer
 IPLayer 10
-SoftmaxLayer
-Output 0.00001
+EuclideanLoss 0.0005

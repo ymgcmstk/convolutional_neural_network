@@ -23,15 +23,28 @@ int main () {
   init_model_and_data(fname, bs);
   srand((unsigned)time(NULL));
   int iter = 0;
+  MatrixXf mean = calc_mean(10000);
+  MatrixXf::Index max_row, max_col;
+  float var = calc_var_float(10000, mean);
+  int correct_num = 0;
+  int term = 500;
   while (true) {
     unsigned long ind = get_random_long(mnist_max);
-    bs.input_layer->data = access_image(ind);
+    bs.input_layer->data = (access_image(ind) - mean)/var;
     bs.output_layer->data = access_label(ind);
     bs.forward();
+    if (bs.is_correct()) correct_num++;
+    bs.backward();
     iter++;
-    if (iter % 100 == 0) {
-      bs.print_output();
-      cout << iter << endl;
+    if (iter % term == 0) {
+      cout << "iter : " << iter << endl;
+      cout << "accuracy : " << (float)correct_num / term << endl;
+      //cout << access_label(ind).transpose() << endl;
+      //bs.print_output();
+      correct_num = 0;
+      //cout << access_image(ind) << endl;
+      //cout << bs.input_layer->data << endl;
+      //cout << iter << endl;
     }
   }
   return 0;

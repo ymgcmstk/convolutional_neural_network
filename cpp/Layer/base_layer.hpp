@@ -12,22 +12,57 @@ public:
   virtual bool backward () {
     return true;
   }
+  virtual bool is_correct () {
+    return false;
+  }
+  string layer_name;
   int x, y, z;
   MatrixXf data, influence;
   float learning_rate;
+  void debug () {
+    //hasAnormal(true);
+  }
+  bool hasNan(bool output) {
+    for_checking_anormal = vectorize(true);
+    for (int i = 0; i < x * y * z; i++) {
+      if (isnan(for_checking_anormal(i, 0))) {
+        if (output) cout << "nan is detected in " << layer_name << endl;
+        cout << data << endl;
+        return true;
+      }
+    }
+    return false;
+  }
+  bool hasInf(bool output) {
+    for_checking_anormal = vectorize(true);
+    for (int i = 0; i < x * y * z; i++) {
+      if (isinf(for_checking_anormal(i, 0))) {
+        if (output) cout << "inf is detected in " << layer_name << endl;
+        return true;
+      }
+    }
+    return false;
+  }
+  bool hasAnormal (bool output) {
+    return hasNan(output) || hasInf(output);
+  }
   void print() {
     for (int i = 0; i < x * y * z; i++) cout << data(i, 0) << " ";
     cout << endl;
   }
-  MatrixXf vectorize () {
-    if (data.cols() == 1) return data;
-    MatrixXf vectorized_data(x * z * y, 1);
-    for (int i = 0; i < z; i++) {
-      vectorized_data.block(i * x * z, 0, x * z, 1) = data.block(0, i, x * z, 1);
+  MatrixXf vectorize (bool horizontal) {
+    if (horizontal && data.cols() == 1) return data;
+    if ((! horizontal) && data.rows() == 1) return data;
+    vectorized = data;
+    vectorized.resize(vectorized.cols() * vectorized.rows(), 1);
+    if (! horizontal) {
+      vectorized.transposeInPlace();
     }
-    return vectorized_data;
+    return vectorized;
   }
   BaseLayer *next_layer, *prev_layer;
+private:
+  MatrixXf for_checking_anormal, vectorized;
 };
 
 /*

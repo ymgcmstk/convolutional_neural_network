@@ -1,6 +1,8 @@
-class DataLayer : public BaseLayer {
+class SoftmaxLossLayer : public BaseLayer {
 public:
-  string layer_name = "DataLayer";
+  SoftmaxLossLayer () {
+    layer_name = "SoftmaxLossLayer";
+  }
   void initialize() {}
   bool forward () {
     if (next_layer == NULL) return false;
@@ -11,10 +13,13 @@ public:
     if (prev_layer == NULL) return false;
     //cross entropy、なぜかうまくいかない。
     //影響の計算が違うのだろうか
-    prev_layer->influence = MatrixXf::Zero(prev_layer->x, prev_layer->y);
+    //そもそも間違ってる,やり直し
     data.maxCoeff(&max_row, &max_col);
     float ans_exp = prev_layer->data(max_row, max_col);
-    prev_layer->influence(max_row, max_col) = - learning_rate + learning_rate * ans_exp / prev_layer->data.array().exp().sum();
+    prev_layer->influence = prev_layer->data.array().exp();
+    prev_layer->influence = prev_layer->influence / prev_layer->influence.sum();
+    prev_layer->influence(max_row, max_col) -= 1;
+    prev_layer->influence *= learning_rate;
     debug();
     return true;
   }
@@ -29,5 +34,4 @@ public:
   }
 private:
   MatrixXf::Index max_row, max_col;
-  float delta = 0.001; //安定化のため
 };

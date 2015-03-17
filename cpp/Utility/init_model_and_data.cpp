@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "../Layer/data_layer.cpp"
+#include "../Layer/input_layer.cpp"
+#include "../Layer/loss/softmax_loss_layer.cpp"
+#include "../Layer/loss/cross_entropy_loss_layer.cpp"
+#include "../Layer/loss/euclidean_loss_layer.cpp"
 #include "../Layer/prelu_layer.cpp"
 #include "../Layer/relu_layer.cpp"
 #include "../Layer/softmax_layer.cpp"
@@ -29,13 +32,29 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
       layer_name.assign(buf_string, 0, buf_string.find(" "));
       if (layer_name == "Input") {
         sscanf(buf_string.c_str(), "Input %d %d %d", &input_x, &input_y, &input_z);
-        new_layer = new DataLayer();
+        new_layer = new InputLayer();
         bs.input_layer = new_layer;
         set_data_size(new_layer, input_x, input_y, input_z);
         prev_layer = new_layer;
-      } else if (layer_name == "Output") {
-        sscanf(buf_string.c_str(), "Output %f", &learning_rate);
-        new_layer = new DataLayer();
+      } else if (layer_name == "SoftmaxLoss") {
+        sscanf(buf_string.c_str(), "SoftmaxLoss %f", &learning_rate);
+        new_layer = new SoftmaxLossLayer();
+        new_layer->learning_rate = learning_rate;
+        bs.output_layer = new_layer;
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+      } else if (layer_name == "EuclideanLoss") {
+        sscanf(buf_string.c_str(), "EuclideanLoss %f", &learning_rate);
+        new_layer = new EuclideanLossLayer();
+        new_layer->learning_rate = learning_rate;
+        bs.output_layer = new_layer;
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+      } else if (layer_name == "CrossEntropyLoss") {
+        sscanf(buf_string.c_str(), "CrossEntropyLoss %f", &learning_rate);
+        new_layer = new CrossEntropyLossLayer();
         new_layer->learning_rate = learning_rate;
         bs.output_layer = new_layer;
         set_data_size(new_layer, input_x, input_y, input_z);

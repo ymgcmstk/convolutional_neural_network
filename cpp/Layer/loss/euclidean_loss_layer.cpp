@@ -1,6 +1,8 @@
-class DataLayer : public BaseLayer {
+class EuclideanLossLayer : public BaseLayer {
 public:
-  string layer_name = "DataLayer";
+  EuclideanLossLayer () {
+    layer_name = "EuclideanLossLayer";
+  }
   void initialize() {}
   bool forward () {
     if (next_layer == NULL) return false;
@@ -24,5 +26,4 @@ public:
   }
 private:
   MatrixXf::Index max_row, max_col;
-  float delta = 0.001; //安定化のため
 };
