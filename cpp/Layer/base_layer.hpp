@@ -20,6 +20,7 @@ public:
   MatrixXf data, influence;
   float learning_rate;
   void debug () {
+    //cout << layer_name << " has finished."<< endl;
     //hasAnormal(true);
   }
   bool hasNan(bool output) {
@@ -46,10 +47,6 @@ public:
   bool hasAnormal (bool output) {
     return hasNan(output) || hasInf(output);
   }
-  void print() {
-    for (int i = 0; i < x * y * z; i++) cout << data(i, 0) << " ";
-    cout << endl;
-  }
   MatrixXf vectorize (bool horizontal) {
     if (horizontal && data.cols() == 1) return data;
     if ((! horizontal) && data.rows() == 1) return data;
@@ -61,6 +58,13 @@ public:
     return vectorized;
   }
   BaseLayer *next_layer, *prev_layer;
+  void print() {
+    for (int i = 0; i < x * y * z; i++) cout << data(i, 0) << " ";
+    cout << endl;
+  }
+  void matsize(MatrixXf this_mat) {
+    cout << "rows:" << this_mat.rows() << ", cols:" << this_mat.cols() << endl;
+  }
 private:
   MatrixXf for_checking_anormal, vectorized;
 };
