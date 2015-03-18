@@ -9,6 +9,7 @@
 #include "../Layer/relu_layer.cpp"
 #include "../Layer/softmax_layer.cpp"
 #include "../Layer/ip_layer.cpp"
+#include "../Layer/conv_layer.cpp"
 
 void set_data_size (BaseLayer* layer, int input_x, int input_y, int input_z) {
   layer->x = input_x;
@@ -21,7 +22,7 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
     ifstream file (fname.c_str(), ios::binary);
     string buf_string, layer_name;
     BaseLayer *new_layer, *prev_layer;
-    int input_x, input_y, input_z, wx;
+    int input_x, input_y, input_z, num_output, kernel_x, kernel_y, stride, pad_x, pad_y;
     float learning_rate;
     if (! file) {
       cout << "ErrorErrorErrorError(init_model_and_data)" << endl;
@@ -41,6 +42,7 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
         new_layer = new SoftmaxLossLayer();
         new_layer->learning_rate = learning_rate;
         bs.output_layer = new_layer;
+        //この辺input_x, input_y, input_zをすべて1にしたほうが正しいだろうか、意味ないけど
         set_data_size(new_layer, input_x, input_y, input_z);
         new_layer->prev_layer = prev_layer;
         new_layer->prev_layer->next_layer = new_layer;
@@ -49,6 +51,7 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
         new_layer = new EuclideanLossLayer();
         new_layer->learning_rate = learning_rate;
         bs.output_layer = new_layer;
+        //この辺input_x, input_y, input_zをすべて1にしたほうが正しいだろうか、意味ないけど
         set_data_size(new_layer, input_x, input_y, input_z);
         new_layer->prev_layer = prev_layer;
         new_layer->prev_layer->next_layer = new_layer;
@@ -57,16 +60,44 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
         new_layer = new CrossEntropyLossLayer();
         new_layer->learning_rate = learning_rate;
         bs.output_layer = new_layer;
+        //この辺input_x, input_y, input_zをすべて1にしたほうが正しいだろうか、意味ないけど
         set_data_size(new_layer, input_x, input_y, input_z);
         new_layer->prev_layer = prev_layer;
         new_layer->prev_layer->next_layer = new_layer;
+      } else if (layer_name == "ConvLayer") {
+        sscanf(buf_string.c_str(),
+               "ConvLayer %d %d %d",
+               &kernel_x,
+               &kernel_y,
+               &num_output
+        );
+        stride = 1;
+        pad_x = stride / 2;
+        pad_y = stride / 2;
+        ConvLayer *new_conv;
+        new_conv = new ConvLayer();
+        new_conv->stride = stride;
+        new_conv->pad_x = pad_x;
+        new_conv->pad_y = pad_y;
+        new_conv->kernel_x = kernel_x;
+        new_conv->kernel_y = kernel_y;
+        new_layer = new_conv;
+        //strideは1, padはkernel_size / 2で固定する、ややこしくなるからそれでいきたいところ
+        input_x = (input_x + stride - 1) / stride;
+        input_y = (input_y + stride - 1) / stride;
+        input_z = num_output;
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+        prev_layer = new_layer;
+        new_layer->initialize();
       } else if (layer_name == "IPLayer") {
-        sscanf(buf_string.c_str(), "IPLayer %d", &wx);
+        sscanf(buf_string.c_str(), "IPLayer %d", &num_output);
         IPLayer *new_ip;
         new_ip = new IPLayer();
-        new_ip->wx = wx;
+        new_ip->num_output = num_output;
         new_layer = new_ip;
-        input_x = wx;
+        input_x = num_output;
         input_y = 1;
         input_z = 1;
         set_data_size(new_layer, input_x, input_y, input_z);
