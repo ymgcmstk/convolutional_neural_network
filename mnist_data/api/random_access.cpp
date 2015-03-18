@@ -13,7 +13,7 @@ string train_images = "/Users/yamaguchi/myproject/my_cnn/mnist_data/train-images
 string train_labels = "/Users/yamaguchi/myproject/my_cnn/mnist_data/train-labels-binary.txt";
 
 MatrixXf access_image (unsigned long n) {
-  MatrixXf mat(28, 28);
+  MatrixXf mat(784, 1);
   FILE *fp;
   unsigned char buf[784];
   fp = fopen(train_images.c_str(), "rb");
@@ -21,14 +21,12 @@ MatrixXf access_image (unsigned long n) {
     cout << "file not found" << endl;
     exit(1);
   }
-  //cout << n << endl;
-  //print_image_and_label(n);
   fseek(fp, sizeof(unsigned char) * n * 28 * 28, SEEK_SET);
   fread(buf, sizeof(unsigned char), 28 * 28, fp);
   fclose(fp);
   for (int i = 0; i < 28; i++) {
     for (int j = 0; j < 28; j++) {
-      mat(i, j) = float(buf[i * 28 + j]);
+      mat(i * 28 + j, 0) = float(buf[i * 28 + j]);
     }
   }
   return mat;
@@ -51,7 +49,7 @@ MatrixXf access_label (unsigned long n) {
 }
 
 MatrixXf calc_mean (int n) {
-  MatrixXf mean = MatrixXf::Zero(28, 28);
+  MatrixXf mean = MatrixXf::Zero(28 * 28, 1);
   for (int i = 0; i < n ; i++) {
     mean += access_image(i);
   }
@@ -59,7 +57,7 @@ MatrixXf calc_mean (int n) {
 }
 
 MatrixXf calc_var (int n, MatrixXf mean) {
-  return MatrixXf::Zero(28, 28);
+  return MatrixXf::Zero(28 * 28, 1);
 }
 
 float calc_mean_float (int n) {
