@@ -1,13 +1,20 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
+// a layer for data
 #include "../Layer/input_layer.cpp"
+// layers for loss
 #include "../Layer/loss/softmax_loss_layer.cpp"
 #include "../Layer/loss/cross_entropy_loss_layer.cpp"
 #include "../Layer/loss/euclidean_loss_layer.cpp"
+// layers for activation
 #include "../Layer/prelu_layer.cpp"
 #include "../Layer/relu_layer.cpp"
 #include "../Layer/softmax_layer.cpp"
+// a layer for pooling
+#include "../Layer/pool/max_pooling_layer.cpp"
+// other layers
 #include "../Layer/ip_layer.cpp"
 #include "../Layer/conv_layer.cpp"
 
