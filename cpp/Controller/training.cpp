@@ -18,7 +18,9 @@ unsigned long get_random_long(unsigned long n_max) {
 }
 
 int main () {
-  string fname = "../../model_files/mnist_mlp.txt";
+  //string fname = "../../model_files/mnist_mlp.txt";
+  string fname = "../../model_files/mnist_cnn.txt";
+  //string fname = "../../model_files/debug_net.txt";
   BaseStructure bs;
   init_model_and_data(fname, bs);
   srand((unsigned)time(NULL));

@@ -4,6 +4,7 @@ public:
     layer_name = "PReLULayer";
   }
   float weight;
+  //これweightひとつしかないけどconvの次だったらnum_output分だけ用意するのもありかも、まあいっか
   void initialize() {
     weight = 0;
   }
@@ -24,11 +25,7 @@ public:
       (prev_layer->data.array()<=0.0).cast<float>().array() * influence.array() * weight;
     weight = weight - (transposed * compared)(0,0);
     debug();
-    //print_weight ();
     return true;
-  }
-  void print_weight () {
-    cout << weight << endl;
   }
 private:
   MatrixXf transposed;
