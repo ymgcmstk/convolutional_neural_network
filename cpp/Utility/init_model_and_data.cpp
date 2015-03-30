@@ -29,7 +29,7 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
     ifstream file (fname.c_str(), ios::binary);
     string buf_string, layer_name;
     BaseLayer *new_layer, *prev_layer;
-    int input_x, input_y, input_z, num_output, kernel_x, kernel_y, stride, pad_x, pad_y;
+    int input_x, input_y, input_z, num_output, kernel_x, kernel_y, stride, padding;
     float learning_rate;
     if (! file) {
       cout << "ErrorErrorErrorError(init_model_and_data)" << endl;
@@ -71,7 +71,27 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
         set_data_size(new_layer, input_x, input_y, input_z);
         new_layer->prev_layer = prev_layer;
         new_layer->prev_layer->next_layer = new_layer;
+      } else if (layer_name == "ReLULayer") {
+        new_layer = new ReLULayer();
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+        prev_layer = new_layer;
+      } else if (layer_name == "PReLULayer") {
+        new_layer = new PReLULayer();
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+        prev_layer = new_layer;
+      } else if (layer_name == "SoftmaxLayer") {
+        new_layer = new SoftmaxLayer();
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+        prev_layer = new_layer;
       } else if (layer_name == "ConvLayer") {
+        //strideは現状1で固定、paddingは1にするとクリチェフスキーのものになる
+        //1にしないと適宜小さくなっていく
         sscanf(buf_string.c_str(),
                "ConvLayer %d %d %d",
                &kernel_x,
@@ -79,19 +99,54 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
                &num_output
         );
         stride = 1;
-        pad_x = stride / 2;
-        pad_y = stride / 2;
+        padding = 1;//paddingは1推奨,0にすると学習しなくなる(バグ)
         ConvLayer *new_conv;
         new_conv = new ConvLayer();
+        if (padding == 0) new_conv->padding = false;
+        else new_conv->padding = true;
         new_conv->stride = stride;
-        new_conv->pad_x = pad_x;
-        new_conv->pad_y = pad_y;
         new_conv->kernel_x = kernel_x;
         new_conv->kernel_y = kernel_y;
         new_layer = new_conv;
-        //strideは1, padはkernel_size / 2で固定する、ややこしくなるからそれでいきたいところ
-        input_x = (input_x + stride - 1) / stride;
-        input_y = (input_y + stride - 1) / stride;
+        if (new_conv->padding) {
+          input_x = (input_x + stride - 1) / stride;
+          input_y = (input_y + stride - 1) / stride;
+        } else {
+          input_x = (input_x - kernel_x + stride) / stride;
+          input_y = (input_y - kernel_y + stride) / stride;
+        }
+        input_z = num_output;
+        set_data_size(new_layer, input_x, input_y, input_z);
+        new_layer->prev_layer = prev_layer;
+        new_layer->prev_layer->next_layer = new_layer;
+        prev_layer = new_layer;
+        new_layer->initialize();
+      } else if (layer_name == "ConvLayer") {
+        //strideは現状1で固定、paddingは1にするとクリチェフスキーのものになる
+        //1にしないと適宜小さくなっていく
+        sscanf(buf_string.c_str(),
+               "ConvLayer %d %d %d",
+               &kernel_x,
+               &kernel_y,
+               &num_output
+        );
+        stride = 1;
+        padding = 1;
+        ConvLayer *new_conv;
+        new_conv = new ConvLayer();
+        if (padding == 0) new_conv->stride = false;
+        else new_conv->stride = true;
+        new_conv->padding = padding;
+        new_conv->kernel_x = kernel_x;
+        new_conv->kernel_y = kernel_y;
+        new_layer = new_conv;
+        if (new_conv->padding) {
+          input_x = (input_x + stride - 1) / stride;
+          input_y = (input_y + stride - 1) / stride;
+        } else {
+          input_x = (input_x - kernel_x + stride) / stride;
+          input_y = (input_y - kernel_y + stride) / stride;
+        }
         input_z = num_output;
         set_data_size(new_layer, input_x, input_y, input_z);
         new_layer->prev_layer = prev_layer;
@@ -112,24 +167,6 @@ void init_model_and_data (const string& fname, BaseStructure& bs) {
         new_layer->prev_layer->next_layer = new_layer;
         prev_layer = new_layer;
         new_layer->initialize();
-      } else if (layer_name == "ReLULayer") {
-        new_layer = new ReLULayer();
-        set_data_size(new_layer, input_x, input_y, input_z);
-        new_layer->prev_layer = prev_layer;
-        new_layer->prev_layer->next_layer = new_layer;
-        prev_layer = new_layer;
-      } else if (layer_name == "PReLULayer") {
-        new_layer = new PReLULayer();
-        set_data_size(new_layer, input_x, input_y, input_z);
-        new_layer->prev_layer = prev_layer;
-        new_layer->prev_layer->next_layer = new_layer;
-        prev_layer = new_layer;
-      } else if (layer_name == "SoftmaxLayer") {
-        new_layer = new SoftmaxLayer();
-        set_data_size(new_layer, input_x, input_y, input_z);
-        new_layer->prev_layer = prev_layer;
-        new_layer->prev_layer->next_layer = new_layer;
-        prev_layer = new_layer;
       } else {
         cout << "ErrorErrorErrorError(init_model_and_data)" << endl;
         cout << layer_name  << " does not exist." << endl;
