@@ -6,6 +6,7 @@ public:
   int num_output, w;
   MatrixXf weights, bias;
   float dropout;
+  MatrixXf choosed;
   void initialize() {
     w = prev_layer->x * prev_layer->y * prev_layer->z;
     weights = MatrixXf::Random(num_output, w);
@@ -26,4 +27,25 @@ public:
     debug();
     return true;
   }
+  void choose_neurons() {
+    choosed =
+    temp = rand() % 100 * 1.0 / 100;
+    if (temp < dropout) {
+    }
+  }
+
 };
+
+
+/*
+仕様
+forward
+  使うニューロンを決定
+  メンバ変数に記録
+  各ニューロンの重みを1/(1-落とした割合)にする
+backward
+  使ったニューロンに関する重みのみを更新する
+  使ったニューロンの重みを(1-落とした割合)に戻す
+randの生成方法について
+
+*/
